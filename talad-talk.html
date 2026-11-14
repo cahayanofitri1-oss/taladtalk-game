@@ -1,0 +1,539 @@
+<title>Talad Talk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mali:wght@600;700&family=Prompt:wght@400;500;600&display=swap">
+<style>
+/* Layout: floating-market canal. Home = three boats (topics), map = four stalls (stages), play = one big question at a time. */
+:root{
+  --bg:#eef8f7; --surface:#ffffff; --soft:#e0f1ef; --ink:#0a2a32; --muted:#496a70; --line:#c9e1df;
+  --teal:#0d7f86; --teal-ink:#ffffff; --mango:#f5b61b; --mango-ink:#3a2a00; --lotus:#d63a76;
+  --ok:#17884a; --ok-bg:#dcf5e6; --bad:#c8372f; --bad-bg:#fde4e1;
+  --f-body:'Prompt','Noto Sans Thai',system-ui,sans-serif;
+  --f-display:'Mali','Prompt','Noto Sans Thai',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#07212a; --surface:#0e303b; --soft:#123e49; --ink:#e7f6f4; --muted:#96b8bb; --line:#1c4955;
+    --teal:#38c1c3; --teal-ink:#052a2f; --mango:#ffc93c; --mango-ink:#3a2a00; --lotus:#ff7aa8;
+    --ok:#5fe08f; --ok-bg:#12432b; --bad:#ff8379; --bad-bg:#4a1f1f; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#07212a; --surface:#0e303b; --soft:#123e49; --ink:#e7f6f4; --muted:#96b8bb; --line:#1c4955;
+  --teal:#38c1c3; --teal-ink:#052a2f; --mango:#ffc93c; --mango-ink:#3a2a00; --lotus:#ff7aa8;
+  --ok:#5fe08f; --ok-bg:#12432b; --bad:#ff8379; --bad-bg:#4a1f1f; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.55;
+  padding-block:14px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:760px;margin:0 auto;min-width:0}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--mango);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:20px;color:var(--teal);display:flex;align-items:center;gap:8px;background:none;border:0;padding:6px 0}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:600;font-size:14px}
+.pill b{color:var(--mango);font-size:16px;-webkit-text-stroke:.4px var(--mango-ink)}
+.wave{display:block;width:100%;height:18px;margin:0 0 18px;color:var(--teal);opacity:.4}
+
+/* buttons */
+.btn{min-height:48px;padding:10px 20px;border-radius:14px;border:2px solid transparent;font-weight:600;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn-primary{background:var(--teal);color:var(--teal-ink)}
+.btn-mango{background:var(--mango);color:var(--mango-ink)}
+.btn-ghost{background:var(--surface);border-color:var(--line)}
+.btn-lg{min-height:60px;font-size:18px;padding-inline:26px}
+.back{background:none;border:0;display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-weight:500;padding:8px 0;min-height:44px}
+
+/* home */
+.hero{padding:6px 0 18px}
+.hero h1{font-size:clamp(34px,9vw,52px);color:var(--teal)}
+.hero p{margin:8px 0 0;font-size:18px;color:var(--muted);max-width:34ch}
+.soundtest{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:14px 0 24px;padding:12px 14px;background:var(--soft);border-radius:14px}
+.soundtest span{flex:1 1 200px;font-size:15px}
+.topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.boat{text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:20px 20px 40px 40px;padding:18px 18px 22px;display:flex;flex-direction:column;gap:8px;min-width:0;transition:transform .15s,border-color .15s}
+.boat:hover{transform:translateY(-3px);border-color:var(--teal)}
+.boat .em{font-size:44px;line-height:1}
+.boat h3{font-size:22px}
+.boat small{color:var(--muted);font-size:14px}
+.boat .prog{margin-top:6px;font-weight:600;color:var(--teal)}
+.how{margin-top:26px;padding-left:20px;color:var(--muted);font-size:15px}
+.how li{margin-bottom:4px}
+
+/* map */
+.maphead{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.maphead .em{font-size:46px;line-height:1}
+.maphead h2{font-size:28px}
+.maphead small{color:var(--muted)}
+.stages{display:grid;gap:12px}
+.stage{display:flex;align-items:center;gap:14px;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:14px 16px;min-width:0}
+.stage:hover{border-color:var(--teal)}
+.stage .ico{font-size:32px;width:56px;height:56px;border-radius:16px;background:var(--soft);display:grid;place-items:center;flex:none}
+.stage .txt{flex:1;min-width:0;display:flex;flex-direction:column}
+.stage .txt b{font-size:18px}
+.stage .txt small{color:var(--muted);font-size:14px}
+.stars{font-size:22px;letter-spacing:2px;color:var(--mango);white-space:nowrap;-webkit-text-stroke:.5px var(--mango-ink)}
+.stars .off{color:var(--line);-webkit-text-stroke:0}
+
+/* play */
+.playhead{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.playhead .bar{flex:1;height:10px;background:var(--soft);border-radius:99px;overflow:hidden}
+.playhead .bar i{display:block;height:100%;background:var(--teal);border-radius:99px;transition:width .3s}
+.stagetitle{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:6px 0 4px}
+.stagetitle h2{font-size:24px}
+.instr{margin:0 0 16px;color:var(--muted)}
+.stagebox{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:20px;min-width:0}
+.playrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+.heard{min-height:56px;margin:0 0 14px;padding:10px 14px;border-radius:12px;background:var(--soft);font-size:18px}
+.heard .th{display:block;color:var(--muted);font-size:15px;margin-top:2px}
+.heard.hid{color:var(--muted);font-style:italic;font-size:15px}
+.opts{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+.opt{min-height:104px;border-radius:18px;background:var(--surface);border:2.5px solid var(--line);font-size:46px;line-height:1;padding:10px;display:grid;place-items:center;transition:transform .12s,border-color .12s}
+.opt.txt{font-size:34px;font-family:var(--f-display);font-weight:700}
+.opt:hover:not([disabled]){border-color:var(--teal);transform:translateY(-2px)}
+.opt.ok{background:var(--ok-bg);border-color:var(--ok)}
+.opt.bad{background:var(--bad-bg);border-color:var(--bad);opacity:.7}
+.fb{min-height:30px;margin:14px 0 4px;font-weight:600;font-size:17px}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+.next{display:flex;justify-content:flex-end;margin-top:10px}
+
+/* order */
+.tray{min-height:64px;display:flex;flex-wrap:wrap;gap:8px;padding:10px;border-radius:14px;border:2.5px dashed var(--line);margin-bottom:14px;align-content:flex-start}
+.tray.ok{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
+.tray.bad{border-color:var(--bad)}
+.bank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;min-height:50px}
+.chip{min-height:46px;padding:6px 16px;border-radius:12px;border:2px solid var(--teal);background:var(--surface);font-weight:600;font-size:18px}
+.chip.used{visibility:hidden}
+.tray .chip{background:var(--teal);color:var(--teal-ink)}
+
+/* speak */
+.sent{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,6vw,32px);line-height:1.35;margin:0 0 4px}
+.sent .w{padding:0 2px;border-radius:6px;transition:background .15s}
+.sent .w.on{background:var(--mango);color:var(--mango-ink)}
+.th-line{color:var(--muted);margin:0 0 16px}
+.tip{display:flex;gap:10px;padding:12px 14px;border-radius:14px;background:var(--soft);margin:0 0 16px;font-size:15px}
+.tip b{color:var(--lotus);white-space:nowrap}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.step{font-size:14px;font-weight:600;padding:4px 12px;border-radius:99px;background:var(--soft);color:var(--muted)}
+.step.now{background:var(--teal);color:var(--teal-ink)}
+.step.done{background:var(--ok-bg);color:var(--ok)}
+.rate{display:flex;gap:10px;flex-wrap:wrap}
+
+/* talk */
+.say{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px}
+.avatar{font-size:38px;width:62px;height:62px;border-radius:50%;background:var(--soft);display:grid;place-items:center;flex:none}
+.bubble{flex:1;min-width:0;background:var(--soft);border-radius:4px 18px 18px 18px;padding:12px 16px}
+.bubble .heard{margin:0;padding:0;background:none;min-height:0}
+.replies{display:grid;gap:10px}
+.reply{text-align:left;padding:14px 16px;border-radius:14px;border:2.5px solid var(--line);background:var(--surface);font-size:17px;font-weight:500}
+.reply:hover:not([disabled]){border-color:var(--teal)}
+.reply.ok{background:var(--ok-bg);border-color:var(--ok)}
+.reply.bad{background:var(--bad-bg);border-color:var(--bad);opacity:.7}
+
+/* result */
+.result{text-align:center;padding:10px 0}
+.result .big{font-size:64px;letter-spacing:6px;color:var(--mango);-webkit-text-stroke:1px var(--mango-ink)}
+.result .big .off{color:var(--line);-webkit-text-stroke:0}
+.result h2{font-size:30px;margin:6px 0}
+.result p{color:var(--muted);margin:4px 0 20px}
+.result .acts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pop{animation:pop .35s}
+@keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.08)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap" id="app"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- content ---------- */
+var STAGES=[
+  {id:"pick",ico:"🎧",th:"ฟังแล้วเลือก",en:"Listen & Choose",hint:"กดฟังประโยค แล้วแตะภาพหรือตัวเลขที่ตรงกับที่ได้ยิน"},
+  {id:"order",ico:"🧩",th:"ฟังแล้วเรียงคำ",en:"Listen & Order",hint:"ฟังประโยค แล้วแตะคำเรียงให้ถูกลำดับ"},
+  {id:"speak",ico:"🗣️",th:"ฟังแล้วพูดตาม",en:"Listen & Repeat",hint:"ฟังตัวอย่าง พูดตามออกเสียงดัง ๆ แล้วประเมินตัวเอง"},
+  {id:"talk",ico:"💬",th:"สนทนา",en:"Role-play",hint:"ฟังคู่สนทนา เลือกคำตอบที่เหมาะสม แล้วพูดตอบออกเสียงดัง ๆ"}
+];
+/* In pick items and talk replies, the FIRST option is the correct one; it is shuffled at runtime. */
+var TOPICS=[
+ {id:"market",em:"🛶",th:"ที่ตลาดน้ำ",en:"At the Market",who:{em:"🧑‍🍳",name:"Vendor"},
+  pick:[
+   {say:"I want a mango, please.",th:"ขอมะม่วงหนึ่งลูกค่ะ/ครับ",o:["🥭","🍌","🍉"]},
+   {say:"Two coconuts, please.",th:"ขอมะพร้าวสองลูกค่ะ/ครับ",o:["🥥🥥","🥥","🥥🥥🥥"]},
+   {say:"That is forty baht.",th:"อันนั้นสี่สิบบาท",o:["40","14","4"],t:1},
+   {say:"The fish is sixty baht.",th:"ปลาราคาหกสิบบาท",o:["60","16","6"],t:1},
+   {say:"I would like a pineapple.",th:"ขอสับปะรดหนึ่งผลค่ะ/ครับ",o:["🍍","🍊","🍇"]}
+  ],
+  order:[
+   {s:"How much is this mango?",th:"มะม่วงลูกนี้ราคาเท่าไร"},
+   {s:"I want two bananas, please.",th:"ขอกล้วยสองผลค่ะ/ครับ"},
+   {s:"It is forty baht.",th:"ราคาสี่สิบบาท"}
+  ],
+  speak:[
+   {s:"Can I have a coconut, please?",th:"ขอมะพร้าวหนึ่งลูกได้ไหมคะ/ครับ",tip:"คำว่า coconut ลงท้ายด้วยเสียง t ให้หยุดลมเบา ๆ ไม่ต้องออกเสียง \"ท\" ชัดเจน"},
+   {s:"How much is this?",th:"อันนี้ราคาเท่าไร",tip:"คำว่า much ลงท้ายด้วยเสียง ch คล้าย \"ช\" ไม่ใช่ \"ด\" และสระสั้นเหมือน \"มัช\""},
+   {s:"That is too expensive.",th:"แพงเกินไป",tip:"เสียง th ในคำว่า that ให้วางปลายลิ้นระหว่างฟันบนและฟันล่าง อย่าออกเสียงเป็น \"แด็ท\""},
+   {s:"Thank you very much.",th:"ขอบคุณมากค่ะ/ครับ",tip:"th ใน thank ใช้ปลายลิ้นแตะฟัน ส่วน very ให้ฟันบนแตะริมฝีปากล่าง (เสียง v ไม่ใช่ w)"}
+  ],
+  talk:[
+   {p:"Hello! What would you like?",th:"สวัสดี! รับอะไรดีคะ/ครับ",r:["I would like two mangoes, please.","I am fine, thank you.","I go to school by bus."],rth:"ฉันขอมะม่วงสองลูกนะคะ/ครับ"},
+   {p:"That is sixty baht.",th:"หกสิบบาทค่ะ/ครับ",r:["Here you are.","Nice to meet you.","I am twelve years old."],rth:"นี่ค่ะ/ครับ (ยื่นเงิน)"},
+   {p:"Thank you. Have a nice day!",th:"ขอบคุณค่ะ/ครับ ขอให้มีวันที่ดีนะ",r:["You too! Goodbye.","I want a coconut.","It is forty baht."],rth:"เช่นกันนะคะ/ครับ ลาก่อน"}
+  ]},
+ {id:"directions",em:"🧭",th:"ถามทาง",en:"Directions",who:{em:"🧳",name:"Tourist"},
+  pick:[
+   {say:"Go straight, then turn left.",th:"เดินตรงไป แล้วเลี้ยวซ้าย",o:["⬆️ ⬅️","⬆️ ➡️","⬅️ ⬆️"]},
+   {say:"Turn right, then go straight.",th:"เลี้ยวขวา แล้วเดินตรงไป",o:["➡️ ⬆️","⬆️ ➡️","⬅️ ⬆️"]},
+   {say:"You can see a doctor here.",th:"คุณพบหมอได้ที่นี่",o:["🏥","🏫","🏦"]},
+   {say:"Monks live and pray here.",th:"พระสงฆ์อาศัยและสวดมนต์ที่นี่",o:["🛕","🏪","🏫"]},
+   {say:"You can borrow books here.",th:"คุณยืมหนังสือได้ที่นี่",o:["📚","🏦","🛕"]}
+  ],
+  order:[
+   {s:"The bank is next to the temple.",th:"ธนาคารอยู่ข้างวัด"},
+   {s:"Turn left at the traffic light.",th:"เลี้ยวซ้ายที่ไฟจราจร"},
+   {s:"Go straight for two blocks.",th:"เดินตรงไปสองช่วงตึก"}
+  ],
+  speak:[
+   {s:"Excuse me, where is the hospital?",th:"ขอโทษค่ะ/ครับ โรงพยาบาลอยู่ที่ไหน",tip:"hospital เน้นพยางค์แรก HOS-pi-tal และลงท้ายเสียง l ให้ปลายลิ้นแตะเพดานปาก"},
+   {s:"Turn right at the corner.",th:"เลี้ยวขวาที่หัวมุม",tip:"เสียง r ในภาษาอังกฤษให้ม้วนลิ้นเข้าหาเพดานปากโดยไม่ให้ลิ้นสะบัด ต่างจาก \"ร\" ในภาษาไทย"},
+   {s:"It is opposite the market.",th:"อยู่ตรงข้ามตลาด",tip:"opposite เน้นพยางค์แรก OP-o-zit และเสียง s ตรงกลางออกเสียงเป็น z"},
+   {s:"Thank you for your help.",th:"ขอบคุณที่ช่วยนะคะ/ครับ",tip:"th ใน thank วางปลายลิ้นระหว่างฟัน และคำว่า help ให้ออกเสียง l ก่อนปิดด้วย p"}
+  ],
+  talk:[
+   {p:"Excuse me, where is the post office?",th:"ขอโทษนะคะ/ครับ ที่ทำการไปรษณีย์อยู่ที่ไหน",r:["It is next to the bank.","I like your bag.","It is seven o'clock."],rth:"อยู่ข้างธนาคาร"},
+   {p:"How can I get there?",th:"ไปที่นั่นได้อย่างไร",r:["Go straight and turn left.","I have a headache.","Yes, I do."],rth:"เดินตรงไปแล้วเลี้ยวซ้าย"},
+   {p:"Thank you so much!",th:"ขอบคุณมากเลยค่ะ/ครับ",r:["You are welcome.","See you tomorrow.","I am sorry."],rth:"ยินดีค่ะ/ครับ"}
+  ]},
+ {id:"routine",em:"⏰",th:"กิจวัตรประจำวัน",en:"My Day",who:{em:"🧒",name:"Friend"},
+  pick:[
+   {say:"I wake up at six o'clock.",th:"ฉันตื่นนอนหกโมงเช้า",o:["6:00","7:00","6:30"],t:1},
+   {say:"School starts at eight thirty.",th:"โรงเรียนเริ่มแปดโมงครึ่ง",o:["8:30","8:13","3:30"],t:1},
+   {say:"I brush my teeth every morning.",th:"ฉันแปรงฟันทุกเช้า",o:["🪥","🍳","🚌"]},
+   {say:"She goes to school by bus.",th:"เธอไปโรงเรียนโดยรถบัส",o:["🚌","🚲","🛵"]},
+   {say:"We do homework after dinner.",th:"เราทำการบ้านหลังอาหารเย็น",o:["📚","🎮","😴"]}
+  ],
+  order:[
+   {s:"I wake up at six o'clock.",th:"ฉันตื่นนอนหกโมงเช้า"},
+   {s:"She eats breakfast at seven.",th:"เธอกินอาหารเช้าตอนเจ็ดโมง"},
+   {s:"We go home after school.",th:"เรากลับบ้านหลังเลิกเรียน"}
+  ],
+  speak:[
+   {s:"I brush my teeth every morning.",th:"ฉันแปรงฟันทุกเช้า",tip:"every ออกเสียงสองพยางค์ EV-ry (ไม่ใช่ เอ-เว-รี่) และ brush ลงท้ายด้วยเสียง sh"},
+   {s:"What time do you go to school?",th:"คุณไปโรงเรียนกี่โมง",tip:"school ขึ้นต้นด้วย s+k ติดกัน อย่าเติมสระ \"สะ-คูล\" ให้พูดเป็น \"สคูล\" เร็ว ๆ"},
+   {s:"I do my homework after dinner.",th:"ฉันทำการบ้านหลังอาหารเย็น",tip:"homework ลงท้ายด้วยเสียง k และ after เน้นพยางค์แรก AF-ter"},
+   {s:"I go to bed at nine thirty.",th:"ฉันเข้านอนเก้าโมงครึ่ง",tip:"thirty ขึ้นต้นด้วย th วางลิ้นระหว่างฟัน สระเสียงยาว \"เธอ\" และเน้นพยางค์แรก THIR-ty"}
+  ],
+  talk:[
+   {p:"What time do you wake up?",th:"คุณตื่นนอนกี่โมง",r:["I wake up at six o'clock.","I like pizza.","I am in Grade Seven."],rth:"ฉันตื่นหกโมงเช้า"},
+   {p:"What do you do after school?",th:"หลังเลิกเรียนคุณทำอะไร",r:["I do my homework.","It is Monday.","She is my teacher."],rth:"ฉันทำการบ้าน"},
+   {p:"What time do you go to bed?",th:"คุณเข้านอนกี่โมง",r:["I go to bed at nine thirty.","I go to the market.","Yes, I am."],rth:"ฉันเข้านอนเก้าโมงครึ่ง"}
+  ]}
+];
+
+var GOOD=["เยี่ยมมาก!","ถูกต้อง!","เก่งมาก!","สุดยอด!","ใช่เลย!"];
+var KEY="talad-talk.v1";
+
+/* ---------- helpers ---------- */
+function $(s,el){return (el||document).querySelector(s)}
+function $$(s,el){return Array.prototype.slice.call((el||document).querySelectorAll(s))}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function topicBy(id){return TOPICS.filter(function(t){return t.id===id})[0]}
+function stageBy(id){return STAGES.filter(function(s){return s.id===id})[0]}
+function starsHtml(n){var s="";for(var i=1;i<=3;i++)s+=i<=n?"★":'<span class="off">★</span>';return s}
+
+var P={};
+try{P=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){P={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(P))}catch(e){}}
+function starsOf(t,s){return (P[t]&&P[t][s])||0}
+function topicStars(t){return STAGES.reduce(function(a,s){return a+starsOf(t,s.id)},0)}
+function totalStars(){return TOPICS.reduce(function(a,t){return a+topicStars(t.id)},0)}
+
+/* ---------- speech (listening) ---------- */
+var synth=window.speechSynthesis||null, voice=null, uid=0, wbw=0;
+function pickVoice(){
+  if(!synth)return;
+  var vs=synth.getVoices();
+  voice=vs.filter(function(v){return /en[-_]US/i.test(v.lang)})[0]||vs.filter(function(v){return /^en/i.test(v.lang)})[0]||null;
+}
+if(synth){pickVoice();synth.onvoiceschanged=pickVoice}
+function stopSpeech(){uid++;wbw++;if(synth)try{synth.cancel()}catch(e){}}
+function speak(text,rate,done){
+  if(!synth){if(done)done();return}
+  var id=++uid;
+  try{synth.cancel()}catch(e){}
+  var u=new SpeechSynthesisUtterance(text);
+  u.lang="en-US";if(voice)u.voice=voice;u.rate=rate||0.9;
+  u.onend=function(){if(id===uid&&done)done()};
+  u.onerror=function(){};
+  synth.speak(u);
+}
+function wordByWord(sentence,box){
+  var spans=$$(".w",box),words=sentence.split(" "),t=++wbw,k=0;
+  (function next(){
+    if(t!==wbw||k>=words.length){spans.forEach(function(s){s.classList.remove("on")});return}
+    spans.forEach(function(s,j){s.classList.toggle("on",j===k)});
+    speak(words[k].replace(/[?.,!]/g,""),0.7,function(){k++;setTimeout(next,160)});
+  })();
+}
+
+/* ---------- state + shell ---------- */
+var S={};
+var app=$("#app");
+var ICON_SPK='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M3 10v4h4l5 4V6L7 10H3zm13.5 2a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+var ICON_BACK='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M15.4 5.4 14 4l-8 8 8 8 1.4-1.4L8.8 12z"/></svg>';
+var WAVE='<svg class="wave" viewBox="0 0 400 18" preserveAspectRatio="none" aria-hidden="true"><path d="M0 9 Q25 0 50 9 T100 9 T150 9 T200 9 T250 9 T300 9 T350 9 T400 9" fill="none" stroke="currentColor" stroke-width="3"/></svg>';
+
+function shell(inner){
+  app.innerHTML='<div class="top"><button class="brand" data-act="home">Talad Talk</button><span class="pill"><b>★</b> '+totalStars()+'</span></div>'+WAVE+inner;
+}
+
+/* ---------- home ---------- */
+function home(){
+  stopSpeech();S={screen:"home"};
+  var boats=TOPICS.map(function(t){
+    return '<button class="boat" data-act="topic" data-id="'+t.id+'"><span class="em">'+t.em+'</span><h3>'+t.th+'</h3><small>'+t.en+'</small><span class="prog">★ '+topicStars(t.id)+' / 12</span></button>';
+  }).join("");
+  shell('<section class="hero"><h1>Talad Talk</h1><p>ฝึกฟังและพูดภาษาอังกฤษ ผ่านตลาดน้ำ ร้านค้า และชีวิตประจำวัน</p></section>'+
+    '<div class="soundtest"><span>เปิดเสียงอุปกรณ์ก่อนเริ่มเล่น แล้วกดทดสอบเสียง</span><button class="btn btn-mango" data-act="test">'+ICON_SPK+' ทดสอบเสียง</button></div>'+
+    (synth?'':'<p class="fb bad">อุปกรณ์หรือเบราว์เซอร์นี้ไม่รองรับเสียงอ่านภาษาอังกฤษ ลองเปิดด้วย Chrome หรือ Safari</p>')+
+    '<h2 style="font-size:22px;margin-bottom:12px">เลือกหัวข้อ</h2><div class="topics">'+boats+'</div>'+
+    '<ol class="how"><li>แต่ละหัวข้อมี 4 ด่าน: ฟังแล้วเลือก, เรียงคำ, พูดตาม, สนทนา</li><li>ตอบถูกในครั้งแรกได้ 10 คะแนน ตอบถูกในครั้งถัดไปได้ 5 คะแนน</li><li>สะสมดาว ★ ให้ครบ 3 ดวงในทุกด่าน</li></ol>');
+}
+
+/* ---------- map ---------- */
+function mapScreen(tid){
+  stopSpeech();var t=topicBy(tid);S={screen:"map",topic:tid};
+  var rows=STAGES.map(function(s){
+    return '<button class="stage" data-act="stage" data-id="'+s.id+'"><span class="ico">'+s.ico+'</span><span class="txt"><b>'+s.th+'</b><small>'+s.en+'</small></span><span class="stars">'+starsHtml(starsOf(tid,s.id))+'</span></button>';
+  }).join("");
+  shell('<button class="back" data-act="home">'+ICON_BACK+' หน้าหลัก</button><div class="maphead"><span class="em">'+t.em+'</span><div><h2>'+t.th+'</h2><small>'+t.en+'</small></div></div><div class="stages">'+rows+'</div>');
+}
+
+/* ---------- stage engine ---------- */
+function startStage(tid,sid){
+  stopSpeech();
+  var t=topicBy(tid),items;
+  if(sid==="pick")items=t.pick.map(function(q){
+    return {say:q.say,th:q.th,txt:!!q.t,opts:shuffle(q.o.map(function(v,i){return {v:v,ok:i===0}}))};
+  });
+  else if(sid==="order")items=t.order.map(function(q){return {s:q.s,th:q.th,words:q.s.split(" ")}});
+  else if(sid==="speak")items=t.speak.slice();
+  else items=t.talk.map(function(q){return {p:q.p,th:q.th,rth:q.rth,r:shuffle(q.r.map(function(v,i){return {v:v,ok:i===0}}))}});
+  S={screen:"play",topic:tid,stage:sid,items:items,i:0,pts:0,max:0,streak:0,tries:0};
+  renderQ();
+}
+function frame(inner){
+  var st=stageBy(S.stage),n=S.items.length,pct=Math.round(S.i/n*100);
+  shell('<div class="playhead"><button class="back" data-act="map">'+ICON_BACK+' ออก</button><div class="bar" role="progressbar" aria-valuenow="'+pct+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+pct+'%"></i></div><span class="pill">'+S.pts+' คะแนน</span></div>'+
+    '<div class="stagetitle"><h2>'+st.ico+' '+st.th+'</h2><span style="color:var(--muted)">ข้อ '+(S.i+1)+' / '+n+(S.streak>=3?' · ต่อเนื่อง '+S.streak+' ข้อ':'')+'</span></div><p class="instr">'+st.hint+'</p>'+
+    '<div class="stagebox">'+inner+'</div>');
+}
+function renderQ(){
+  S.tries=0;
+  ({pick:qPick,order:qOrder,speak:qSpeak,talk:qTalk})[S.stage]();
+}
+function nextBtn(){
+  var last=S.i>=S.items.length-1;
+  return '<div class="next"><button class="btn btn-primary btn-lg" data-act="next">'+(last?'ดูผลคะแนน':'ข้อต่อไป')+'</button></div>';
+}
+function award(first,second){
+  S.max+=first;
+  if(S.tries===0){S.pts+=first;S.streak++}else{S.pts+=second;S.streak=0}
+}
+function say(ok){var f=$("#fb");if(!f)return;f.className="fb "+(ok?"ok":"bad")}
+
+/* ---------- pick ---------- */
+function qPick(){
+  var q=S.items[S.i];
+  var opts=q.opts.map(function(o,i){return '<button class="opt'+(q.txt?' txt':'')+'" data-act="opt" data-i="'+i+'">'+esc(o.v)+'</button>'}).join("");
+  frame('<div class="playrow"><button class="btn btn-primary btn-lg" data-act="play">'+ICON_SPK+' ฟัง</button><button class="btn btn-ghost" data-act="slow">ฟังช้า</button></div>'+
+    '<p class="heard hid" id="heard">ประโยคจะแสดงหลังตอบ</p><div class="opts">'+opts+'</div><div class="fb" id="fb" aria-live="polite"></div><div id="nx"></div>');
+  setTimeout(function(){if(S.screen==="play"&&S.stage==="pick")speak(q.say,0.9)},350);
+}
+function pickAnswer(i){
+  var q=S.items[S.i],btns=$$(".opt"),o=q.opts[i],fb=$("#fb");
+  if(o.ok){
+    award(10,5);btns[i].classList.add("ok","pop");
+    fb.textContent=GOOD[Math.floor(Math.random()*GOOD.length)];say(true);
+    finishPick(q,btns);
+  }else{
+    S.tries++;S.streak=0;btns[i].classList.add("bad","shake");btns[i].disabled=true;
+    if(S.tries>=2){
+      S.max+=10;
+      q.opts.forEach(function(x,k){if(x.ok)btns[k].classList.add("ok")});
+      fb.textContent="คำตอบที่ถูกคือข้อที่เป็นสีเขียว ลองฟังอีกครั้งแล้วจำไว้นะ";say(false);finishPick(q,btns);
+    }else{fb.textContent="ยังไม่ใช่ ลองกดฟังอีกครั้งนะ";say(false)}
+  }
+}
+function finishPick(q,btns){
+  btns.forEach(function(b){b.disabled=true});
+  var h=$("#heard");h.classList.remove("hid");h.innerHTML=esc(q.say)+'<span class="th">'+q.th+'</span>';
+  $("#nx").innerHTML=nextBtn();
+}
+
+/* ---------- order ---------- */
+function qOrder(){
+  var q=S.items[S.i],bank=shuffle(q.words.map(function(w,i){return {w:w,i:i}}));
+  if(q.words.length>1&&bank.map(function(b){return b.w}).join(" ")===q.s)bank.reverse();
+  S.bank=bank;S.tray=[];
+  frame('<div class="playrow"><button class="btn btn-primary btn-lg" data-act="play">'+ICON_SPK+' ฟัง</button><button class="btn btn-ghost" data-act="slow">ฟังช้า</button></div>'+
+    '<div class="tray" id="tray" aria-label="ประโยคของคุณ"></div><div class="bank" id="bank"></div>'+
+    '<div class="playrow"><button class="btn btn-mango" data-act="check" id="chk" disabled>ตรวจคำตอบ</button><button class="btn btn-ghost" data-act="clear">ล้างใหม่</button></div>'+
+    '<div class="fb" id="fb" aria-live="polite"></div><div id="nx"></div>');
+  drawOrder();
+  setTimeout(function(){if(S.screen==="play"&&S.stage==="order")speak(q.s,0.9)},350);
+}
+function drawOrder(){
+  $("#tray").innerHTML=S.tray.map(function(b,k){return '<button class="chip" data-act="untap" data-k="'+k+'">'+esc(b.w)+'</button>'}).join("");
+  $("#bank").innerHTML=S.bank.map(function(b){
+    var used=S.tray.some(function(t){return t.i===b.i});
+    return '<button class="chip'+(used?' used':'')+'" data-act="tap" data-i="'+b.i+'"'+(used?' tabindex="-1"':'')+'>'+esc(b.w)+'</button>';
+  }).join("");
+  $("#chk").disabled=S.tray.length!==S.bank.length;
+}
+function checkOrder(){
+  var q=S.items[S.i],ans=S.tray.map(function(b){return b.w}).join(" "),tray=$("#tray"),fb=$("#fb");
+  if(ans===q.s){
+    award(10,5);tray.classList.remove("bad");tray.classList.add("ok","pop");
+    fb.innerHTML=GOOD[Math.floor(Math.random()*GOOD.length)]+' <span style="color:var(--muted);font-weight:400">'+q.th+'</span>';say(true);
+    lockOrder();
+  }else{
+    S.tries++;S.streak=0;tray.classList.add("bad","shake");setTimeout(function(){tray.classList.remove("shake")},400);
+    if(S.tries>=2){
+      S.max+=10;S.tray=q.words.map(function(w,i){return {w:w,i:i}});
+      S.bank=S.bank.map(function(b){return b});
+      // rebuild tray in correct order using bank indices
+      var used={},fixed=[];
+      q.words.forEach(function(w){for(var k=0;k<S.bank.length;k++){if(!used[S.bank[k].i]&&S.bank[k].w===w){used[S.bank[k].i]=1;fixed.push(S.bank[k]);break}}});
+      S.tray=fixed;drawOrder();tray.classList.remove("bad");tray.classList.add("ok");
+      fb.textContent="ประโยคที่ถูกต้องอยู่ด้านบนแล้ว ลองอ่านออกเสียงตามนะ";say(false);lockOrder();
+    }else{fb.textContent="ยังไม่ถูก ลองฟังอีกครั้งแล้วเรียงใหม่";say(false)}
+  }
+}
+function lockOrder(){
+  $$("#bank .chip, #tray .chip").forEach(function(b){b.disabled=true});
+  $("#chk").disabled=true;$("#nx").innerHTML=nextBtn();
+}
+
+/* ---------- speak ---------- */
+function qSpeak(){
+  var q=S.items[S.i];S.heard=0;S.reps=0;S.retried=false;
+  var words=q.s.split(" ").map(function(w){return '<span class="w">'+esc(w)+'</span>'}).join(" ");
+  frame('<div class="steps" id="steps"></div><p class="sent" id="sent">'+words+'</p><p class="th-line">'+q.th+'</p>'+
+    '<div class="tip"><b>เคล็ดลับ</b><span>'+q.tip+'</span></div>'+
+    '<div class="playrow"><button class="btn btn-primary btn-lg" data-act="play">'+ICON_SPK+' ฟัง</button><button class="btn btn-ghost" data-act="slow">ฟังช้า</button><button class="btn btn-ghost" data-act="wbw">ทีละคำ</button></div>'+
+    '<div id="practice"></div><div class="fb" id="fb" aria-live="polite"></div><div id="nx"></div>');
+  drawSpeak();
+}
+function drawSpeak(){
+  var st=$("#steps");
+  var s1=S.heard>0?"done":"now",s2=S.heard===0?"":(S.reps>=2?"done":"now"),s3=S.reps>=2?"now":"";
+  st.innerHTML='<span class="step '+s1+'">1 ฟัง</span><span class="step '+s2+'">2 พูดตาม '+Math.min(S.reps,2)+'/2</span><span class="step '+s3+'">3 ประเมินตัวเอง</span>';
+  var p=$("#practice");
+  if(S.reps<2){
+    p.innerHTML='<button class="btn btn-mango btn-lg" data-act="said"'+(S.heard===0?' disabled':'')+'>🎤 ฉันพูดตามแล้ว</button><p class="th-line" style="margin:8px 0 0">'+(S.heard===0?'กดฟังก่อน แล้วพูดตามออกเสียงดัง ๆ':'พูดออกเสียงดัง ๆ แล้วกดปุ่ม ทำ 2 ครั้ง')+'</p>';
+  }else{
+    p.innerHTML='<p style="margin:0 0 8px;font-weight:600">คุณพูดได้ชัดเจนแค่ไหน</p><div class="rate"><button class="btn btn-primary" data-act="clear-ok">พูดได้ชัดเจน</button><button class="btn btn-ghost" data-act="again">ขอฝึกอีกครั้ง</button></div>';
+  }
+}
+function speakDone(clear){
+  if(!clear){S.retried=true;S.tries=1;S.reps=0;S.heard=1;drawSpeak();speak(S.items[S.i].s,0.6);return}
+  award(10,5);
+  var fb=$("#fb");fb.textContent=GOOD[Math.floor(Math.random()*GOOD.length)];say(true);
+  $("#practice").innerHTML="";$("#nx").innerHTML=nextBtn();
+}
+
+/* ---------- talk ---------- */
+function qTalk(){
+  var q=S.items[S.i],t=topicBy(S.topic);S.phase="choose";
+  var rs=q.r.map(function(r,i){return '<button class="reply" data-act="reply" data-i="'+i+'">'+esc(r.v)+'</button>'}).join("");
+  frame('<div class="say"><div class="avatar" aria-hidden="true">'+t.who.em+'</div><div class="bubble"><div class="playrow" style="margin:0 0 6px"><button class="btn btn-primary" data-act="play">'+ICON_SPK+' ฟัง '+t.who.name+'</button><button class="btn btn-ghost" data-act="slow">ฟังช้า</button><button class="btn btn-ghost" data-act="show">ดูข้อความ</button></div><p class="heard hid" id="heard">ข้อความซ่อนอยู่ ฟังก่อนแล้วค่อยเปิดดู</p></div></div>'+
+    '<p style="margin:0 0 8px;font-weight:600">เลือกคำตอบที่เหมาะสม</p><div class="replies" id="replies">'+rs+'</div><div id="practice"></div><div class="fb" id="fb" aria-live="polite"></div><div id="nx"></div>');
+  setTimeout(function(){if(S.screen==="play"&&S.stage==="talk")speak(q.p,0.9)},350);
+}
+function showTalkText(){var q=S.items[S.i],h=$("#heard");h.classList.remove("hid");h.innerHTML=esc(q.p)+'<span class="th">'+q.th+'</span>'}
+function talkReply(i){
+  var q=S.items[S.i],btns=$$(".reply"),o=q.r[i],fb=$("#fb");
+  if(o.ok){
+    award(10,5);btns[i].classList.add("ok","pop");btns.forEach(function(b){b.disabled=true});showTalkText();
+    fb.innerHTML='ตอบได้เหมาะสม <span style="color:var(--muted);font-weight:400">'+q.rth+'</span>';say(true);
+    S.reps=0;S.phase="say";
+    $("#practice").innerHTML='<p class="th-line" style="margin:12px 0 8px">ตอนนี้พูดประโยคนี้ออกเสียงดัง ๆ ให้เหมือนเสียงตัวอย่าง</p><div class="playrow"><button class="btn btn-ghost" data-act="model">'+ICON_SPK+' ฟังตัวอย่างคำตอบ</button><button class="btn btn-mango btn-lg" data-act="talksaid">🎤 ฉันพูดแล้ว</button></div>';
+  }else{
+    S.tries++;S.streak=0;btns[i].classList.add("bad","shake");btns[i].disabled=true;
+    if(S.tries>=2){
+      S.max+=10;btns.forEach(function(b,k){b.disabled=true;if(q.r[k].ok)b.classList.add("ok")});showTalkText();
+      fb.textContent="คำตอบที่เหมาะสมคือข้อสีเขียว ลองพูดตามดูนะ";say(false);S.phase="say";
+      $("#practice").innerHTML='<div class="playrow" style="margin-top:12px"><button class="btn btn-ghost" data-act="model">'+ICON_SPK+' ฟังตัวอย่างคำตอบ</button><button class="btn btn-mango btn-lg" data-act="talksaid">🎤 ฉันพูดแล้ว</button></div>';
+    }else{fb.textContent="ยังไม่เหมาะสม ลองฟังคำถามอีกครั้ง";say(false)}
+  }
+}
+function talkSaid(){
+  S.max+=5;S.pts+=5;$("#practice").innerHTML="";
+  $("#fb").textContent="เยี่ยม! ได้คะแนนจากการพูดเพิ่ม 5 คะแนน";say(true);$("#nx").innerHTML=nextBtn();
+}
+
+/* ---------- next + result ---------- */
+function next(){
+  stopSpeech();S.i++;
+  if(S.i>=S.items.length)return result();
+  renderQ();
+}
+function result(){
+  var pct=S.max?S.pts/S.max:1,stars=pct>=0.85?3:pct>=0.6?2:1;
+  P[S.topic]=P[S.topic]||{};
+  if((P[S.topic][S.stage]||0)<stars)P[S.topic][S.stage]=stars;
+  save();
+  var msg=stars===3?"สุดยอด! คุณฟังและพูดได้ดีมาก":stars===2?"ทำได้ดี ลองเล่นอีกครั้งเพื่อรับดาวครบ 3 ดวง":"ผ่านด่านแล้ว ฝึกอีกครั้งจะเก่งขึ้นแน่นอน";
+  var idx=STAGES.map(function(s){return s.id}).indexOf(S.stage),nx=STAGES[idx+1];
+  S.screen="result";
+  shell('<div class="stagebox result"><div class="big pop">'+starsHtml(stars)+'</div><h2>ผ่านด่านแล้ว!</h2><p>'+msg+'<br>คะแนน '+S.pts+' / '+S.max+'</p><div class="acts">'+
+    (nx?'<button class="btn btn-primary btn-lg" data-act="stage" data-id="'+nx.id+'">ด่านต่อไป: '+nx.th+'</button>':'')+
+    '<button class="btn btn-ghost" data-act="stage" data-id="'+S.stage+'">เล่นอีกครั้ง</button><button class="btn btn-ghost" data-act="map">กลับแผนที่</button></div></div>');
+}
+
+/* ---------- events ---------- */
+app.addEventListener("click",function(e){
+  var el=e.target.closest("[data-act]");if(!el||el.disabled)return;
+  var a=el.getAttribute("data-act"),d=el.dataset;
+  var q=S.items&&S.items[S.i];
+  switch(a){
+    case "home":home();break;
+    case "test":speak("Hello! Welcome to Talad Talk.",0.9);break;
+    case "topic":mapScreen(d.id);break;
+    case "map":mapScreen(S.topic);break;
+    case "stage":startStage(S.topic,d.id);break;
+    case "play":speak(S.stage==="talk"?q.p:(q.say||q.s),0.9);if(S.stage==="speak"){S.heard++;drawSpeak()}break;
+    case "slow":speak(S.stage==="talk"?q.p:(q.say||q.s),0.6);if(S.stage==="speak"){S.heard++;drawSpeak()}break;
+    case "wbw":wordByWord(q.s,$("#sent"));S.heard++;drawSpeak();break;
+    case "opt":pickAnswer(+d.i);break;
+    case "tap":var b=S.bank.filter(function(x){return x.i===+d.i})[0];if(b){S.tray.push(b);drawOrder()}break;
+    case "untap":S.tray.splice(+d.k,1);drawOrder();break;
+    case "clear":S.tray=[];drawOrder();$("#fb").textContent="";break;
+    case "check":checkOrder();break;
+    case "said":S.reps++;drawSpeak();break;
+    case "clear-ok":speakDone(true);break;
+    case "again":speakDone(false);break;
+    case "show":showTalkText();break;
+    case "reply":talkReply(+d.i);break;
+    case "model":speak(q.r.filter(function(r){return r.ok})[0].v,0.85);break;
+    case "talksaid":talkSaid();break;
+    case "next":next();break;
+  }
+});
+
+home();
+})();
+</script>
